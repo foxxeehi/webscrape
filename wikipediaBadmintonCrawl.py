@@ -53,7 +53,7 @@ def crawl(from_year=2007, to_year=2022):
                                            men_single_df)
         else:
             if from_year == 2022:
-                continue
+                break
             driver.get(
                 'https://en.wikipedia.org/wiki/' + str(from_year) + '_BWF_World_Championships')
             crawl_olympic_and_championship(driver, from_year, padding_count, player_title_count_map,
