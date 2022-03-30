@@ -36,11 +36,8 @@ def crawl(category, category_full_name):
         EC.element_to_be_clickable((By.XPATH, "//div[text()=100]"))).click()
     time.sleep(1)
 
-    current_week = 'Week 9 (2022-03-01)'
-    week_list = ['Week 47 (2021-11-23)', 'Week 48 (2021-11-30)', 'Week 49 (2021-12-07)',
-                 'Week 50 (2021-12-14)', 'Week 51 (2021-12-21)', 'Week 52 (2021-12-28)', 'Week 1 (2022-01-04)',
-                 'Week 2 (2022-01-11)', 'Week 3 (2022-01-18)', 'Week 4 (2022-01-25)', 'Week 5 (2022-02-01)',
-                 'Week 6 (2022-02-08)', 'Week 7 (2022-02-15)', 'Week 8 (2022-02-22)', 'Week 9 (2022-03-01)']
+    current_week = 'Week 12 (2022-03-22)'
+    week_list = ['Week 10 (2022-03-08)', 'Week 11 (2022-03-15)', 'Week 12 (2022-03-22)']
     for week in week_list:
 
         # Click the Ranking dropdown to make the list visible
@@ -63,9 +60,12 @@ def crawl(category, category_full_name):
         for row in rows:
             record = row.text.split("\n")
             rank = record[0]
-            points = record[3].split().pop()
-            country = "-"
+            # For double, change to his code
+            #points = record[4].split().pop()
+            #player = record[2] + "/" + record[3]
+            points = record[3]
             player = record[2]
+            country = "-"
             record = [rank, player, country, category, points]
             df.loc[len(df.index)] = record
         path = os.getcwd() + "\\csv\\badminton\\" + category + "\\"

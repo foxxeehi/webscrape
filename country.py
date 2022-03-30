@@ -1,4 +1,7 @@
-def get_country_image(image_name):
+def get_country_image(country_name):
+    if country_name not in get_country_map().keys():
+        return "https://flagpedia.net/data/flags/w702/unknown.png"
+    image_name = get_country_map()[country_name]
     return "https://flagpedia.net/data/flags/w702/" + image_name + ".png"
 
 
