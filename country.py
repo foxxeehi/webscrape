@@ -9,7 +9,7 @@ def get_country_map():
     table = {"China": "cn", "Japan": "jp", "Indonesia": "id", "Denmark": "dk", "Malaysia": "my",
              "Taiwan": "tw", "Thailand": "th", "India": "in", "Singapore": "sg",
              "U.S.A.": "us", "Sweden": "se", "England": "gb-eng", "Netherlands": "nl",
-             "Russia": "ru", "Korea": "kr", "Canada": "ca", "Germany": "de", "Australia": "au",
+             "Russia": "ru", "Korea": "kr", "South Korea": "kr", "Canada": "ca", "Germany": "de", "Australia": "au",
              "Bulgaria": "bg", "Ukraine": "ua", "Finland": "fi", "Belarus": "by", "Cyprus": "cy",
              "Austria": "at", "Poland": "pl", "Scotland": "gb-sct", "Hong Kong": "hk",
              "Wales": "gb-wls", "Zealand": "nz", "Mexico": "mx", "Norway": "no", "France": "fr",

@@ -14,56 +14,60 @@ def crawl(from_year=2007, to_year=2022):
     padding_count = [0]
     player_title_count_map = {}
     column_name_list = ["country", "image", "player"]
+    column_name_supplement_list = ["tour", "winner"]
     men_single_df = pandas.DataFrame(columns=column_name_list)
+    men_single_supplement_df = pandas.DataFrame(columns=column_name_supplement_list)
     olympic_years = [2008, 2012, 2016, 2020]
     while from_year <= 2017:
         # Super Series
         driver.get(
             'https://en.wikipedia.org/wiki/' + str(from_year) + '_BWF_Super_Series')
         crawl_superseries_goldprix(driver, from_year, padding_count, player_title_count_map,
-                                   men_single_df)
+                                   men_single_df, men_single_supplement_df)
         # GrandPrix Series
         driver.get(
             'https://en.wikipedia.org/wiki/' + str(from_year) + '_BWF_Grand_Prix_Gold_and_Grand_Prix')
         crawl_superseries_goldprix(driver, from_year, padding_count, player_title_count_map,
-                                   men_single_df)
+                                   men_single_df, men_single_supplement_df)
         # Olympic world championship
         if from_year in olympic_years:
             driver.get(
                 'https://en.wikipedia.org/wiki/' + 'Badminton_at_the_' + str(from_year) + '_Summer_Olympics')
-            crawl_olympic_and_championship(driver, from_year, padding_count, player_title_count_map,
-                          men_single_df)
+            crawl_olympic_and_championship(driver, from_year, 'Summer Olympics', olympic_years, padding_count, player_title_count_map,
+                                           men_single_df, men_single_supplement_df)
         else:
             driver.get(
                 'https://en.wikipedia.org/wiki/' + str(from_year) + '_BWF_World_Championships')
-            crawl_olympic_and_championship(driver, from_year, padding_count, player_title_count_map,
-                                           men_single_df)
+            crawl_olympic_and_championship(driver, from_year, 'BWF_World_Championships', olympic_years, padding_count, player_title_count_map,
+                                           men_single_df, men_single_supplement_df)
         from_year = from_year + 1
     while from_year <= to_year:
         # World Tour Super
         driver.get(
             'https://en.wikipedia.org/wiki/' + str(from_year) + '_BWF_World_Tour')
         crawl_world_tour(driver, from_year, padding_count, player_title_count_map,
-                         men_single_df)
+                         men_single_df, men_single_supplement_df)
         # Olympic and world championship
         if from_year in olympic_years:
             driver.get(
                 'https://en.wikipedia.org/wiki/' + 'Badminton_at_the_' + str(from_year) + '_Summer_Olympics')
-            crawl_olympic_and_championship(driver, from_year, padding_count, player_title_count_map,
-                                           men_single_df)
+            crawl_olympic_and_championship(driver, from_year, 'Summer Olympics', olympic_years, padding_count, player_title_count_map,
+                                           men_single_df, men_single_supplement_df)
         else:
             if from_year == 2022:
                 break
             driver.get(
                 'https://en.wikipedia.org/wiki/' + str(from_year) + '_BWF_World_Championships')
-            crawl_olympic_and_championship(driver, from_year, padding_count, player_title_count_map,
-                                           men_single_df)
+            crawl_olympic_and_championship(driver, from_year, 'BWF_World_Championships', olympic_years,padding_count, player_title_count_map,
+                                           men_single_df, men_single_supplement_df)
         from_year = from_year + 1
     men_single_df.to_csv("MS_title" + ".csv")
+    men_single_supplement_df.to_csv("MS_title_supplement" + ".csv")
     driver.quit()
 
 
-def crawl_superseries_goldprix(driver, from_year, padding_count, player_title_count_map, men_single_df):
+def crawl_superseries_goldprix(driver, from_year, padding_count, player_title_count_map,
+                               men_single_df, men_single_supplement_df):
     time.sleep(1)
     schedule_table = driver.find_elements(By.XPATH, "//div[@class='mw-parser-output']/table[@class='wikitable']")[0]
     schedule_table_body = schedule_table.find_element_by_tag_name("tbody")
@@ -84,6 +88,9 @@ def crawl_superseries_goldprix(driver, from_year, padding_count, player_title_co
         player = elements[1].text
         country_name = elements[1].find_element_by_tag_name("span").find_element_by_tag_name("a").accessible_name
         country_image = country.get_country_image(country_name)
+        # update men_single_supplement_df
+        new_tour_winner_pair = [revised_tour_name, player]
+        men_single_supplement_df.loc[len(men_single_supplement_df.index)] = new_tour_winner_pair
         # update player_title_count_map
         if player in player_title_count_map:
             player_title_count_map[player] = player_title_count_map[player] + 1
@@ -104,7 +111,8 @@ def crawl_superseries_goldprix(driver, from_year, padding_count, player_title_co
         index = index + 1
 
 
-def crawl_world_tour(driver, from_year, padding_count, player_title_count_map, men_single_df):
+def crawl_world_tour(driver, from_year, padding_count, player_title_count_map,
+                    men_single_df, men_single_supplement_df):
     result_tables = driver.find_elements(By.XPATH, "//div[@class='mw-parser-output']/table[@class='wikitable']")
     for table in result_tables:
         table_body = table.find_element_by_tag_name("tbody")
@@ -147,6 +155,10 @@ def crawl_world_tour(driver, from_year, padding_count, player_title_count_map, m
                 player = elements[1].find_elements_by_tag_name("a")[1].get_attribute("title")
                 country_name = elements[1].find_elements_by_tag_name("a")[0].get_attribute("title")
                 country_image = country.get_country_image(country_name)
+            tour_name = tour_name.replace(" (badminton)", "")
+            # update men_single_supplement_df
+            new_tour_winner_pair = [tour_name, player]
+            men_single_supplement_df.loc[len(men_single_supplement_df.index)] = new_tour_winner_pair
             # update player_title_count_map
             if player in player_title_count_map:
                 player_title_count_map[player] = player_title_count_map[player] + 1
@@ -162,12 +174,13 @@ def crawl_world_tour(driver, from_year, padding_count, player_title_count_map, m
             new_column_values = []
             for player in men_single_df["player"]:
                 new_column_values.append(player_title_count_map[player])
-            men_single_df[tour_name.replace(" (badminton)", "")] = new_column_values
+            men_single_df[tour_name] = new_column_values
             padding_count[0] = padding_count[0] + 1
             index = index + 10
 
 
-def crawl_olympic_and_championship(driver, from_year, padding_count, player_title_count_map, men_single_df):
+def crawl_olympic_and_championship(driver, from_year, tour_name, olympic_years,padding_count,
+                                   player_title_count_map, men_single_df, men_single_supplement_df):
     result_table = driver.find_element(By.XPATH, "//div[@class='mw-parser-output']/table[@class='wikitable plainrowheaders']")
     table_body = result_table.find_element_by_tag_name("tbody")
     tour_rows = table_body.find_elements_by_tag_name("tr")
@@ -179,10 +192,18 @@ def crawl_olympic_and_championship(driver, from_year, padding_count, player_titl
     # tour_rows[3] is women's doubles
     # tour_rows[4] is mixed doubles
     elements = tour_rows[0].find_elements_by_tag_name("td")
-    revised_tour_name = str(from_year) + " Summer Olympics"
-    player = elements[1].find_element_by_tag_name("a").accessible_name
-    country_name = elements[1].find_elements_by_tag_name("a")[1].accessible_name
-    country_image = country.get_country_image(country_name)
+    revised_tour_name = str(from_year) + " " + tour_name
+    if from_year in olympic_years:
+        player = elements[1].find_element_by_tag_name("a").accessible_name
+        country_name = elements[1].find_elements_by_tag_name("a")[1].accessible_name
+        country_image = country.get_country_image(country_name)
+    else:
+        player = elements[1].find_elements_by_tag_name("a")[1].accessible_name
+        country_name = elements[1].find_elements_by_tag_name("a")[0].accessible_name
+        country_image = country.get_country_image(country_name)
+    # update men_single_supplement_df
+    new_tour_winner_pair = [revised_tour_name, player]
+    men_single_supplement_df.loc[len(men_single_supplement_df.index)] = new_tour_winner_pair
     # update player_title_count_map
     if player in player_title_count_map:
         player_title_count_map[player] = player_title_count_map[player] + 1
