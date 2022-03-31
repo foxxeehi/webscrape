@@ -7,7 +7,7 @@ import extract
 import merge
 import mergeBadminton
 import nbaCrawl
-import wikipediaBadmintonCrawl
+import wikipediaBWFTitleCrawl
 
 # Crawl data from website
 # nbaCrawl.crawl(from_season=1946, to_season=1960)
@@ -38,4 +38,5 @@ import wikipediaBadmintonCrawl
 # mergeBadminton.merge(path=path, main_file_name="1990-01-01", category="MS", destination_file_name="MS")
 
 # Crawl wikipedia Badminton Super Series title result
-wikipediaBadmintonCrawl.crawl()
+wiki = wikipediaBWFTitleCrawl.WikipediaBWFTitleCrawl()
+wiki.crawl()
